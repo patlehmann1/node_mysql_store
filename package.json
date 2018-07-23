@@ -2,7 +2,7 @@
   "name": "node_mysql_store",
   "version": "1.0.0",
   "description": "U of R Node.js and MySQL storefront app",
-  "main": "cli.js",
+  "main": "bamazon.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/patlehmann1/node_mysql_store#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
     "inquirer": "^6.0.0",
     "mysql": "^2.16.0"
   }
