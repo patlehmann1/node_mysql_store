@@ -5,9 +5,8 @@ const cTable = require('console.table');
 
 const divider = "\n------------------------------------------------------------------------------------------";
 const idNumberArray = [];
-const idChoiceArray = [];
-const quantityInStockArray = [];
-const quantityRequestedArray = [];
+let idChoiceArray = [];
+let quantityInStockArray = [];
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -20,6 +19,9 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    pushIdNumbers();
+    idChoiceArray = [];
+    quantityInStockArray = [];
     managerOptions("Please select from the following:");
 });
 
@@ -67,12 +69,15 @@ function pushIdNumbers() {
 }
 
 function showAllProducts() {
-    console.log(divider + "\nPRODUCTS IN STOCK\n" + divider);
-    console.table(res);
-    console.log(divider);
-    managerOptions("What would like to do now?");
-});
-}
+    connection.query("SELECT * from products", function (err, res) {
+        if (err) throw err;
+        console.log(divider + "\nPRODUCTS IN STOCK\n" + divider);
+        console.table(res);
+        console.log(divider);
+        managerOptions("What would like to do now?");
+    });
+};
+
 
 function showLowInventory() {
     console.log(divider + "\nPRODUCTS WITH 5 ITEMS OR LESS IN STOCK\n" + divider);
@@ -91,7 +96,6 @@ function itemChoice() {
             name: "idQuery",
             message: "What is the ID of the product you would like to add quantity to?"
         }]).then(answers => {
-            pushIdNumbers();
             if (!isNaN(answers.idQuery)) {
                 const idParsedValue = parseInt(answers.idQuery);
                 const isInArray = idNumberArray.includes(idParsedValue);
@@ -99,6 +103,7 @@ function itemChoice() {
                     connection.query("SELECT * from products WHERE item_id = " + answers.idQuery, function (err, res) {
                         if (err) throw err;
                         idChoiceArray.push(idParsedValue);
+                        quantityInStockArray.push(res[0].stock_quantity);
                         addInventory();
                     });
                 } else {
@@ -119,55 +124,60 @@ function addInventory() {
             name: "quantityQuery",
             message: "How much of this item would you like to add?"
         }]).then(answers => {
-            const quantityParsedValue = parseInt(answers.quantityQuery);
-            console.log("Updating stock quantity...");
+            console.log(quantityInStockArray[0]);
+            let quantityParsedValue = parseInt(answers.quantityQuery);
+            console.log("\nUpdating stock quantity...");
             const query = connection.query(
                 "UPDATE products SET ? WHERE ?",
                 [
                     {
-                        stock_quantity: quantityInStockArray[0] += quantityParsedValue
+                        stock_quantity: quantityInStockArray[0] + quantityParsedValue
                     },
                     {
                         item_id: idChoiceArray[0]
                     }
                 ],
                 function (err, res) {
-                    const newTotalStock = quantityInStockArray[0] += quantityRequestedArray[0];
-                    console.log(divider + "\nYou now have" + newTotalStock + "of that product in stock!\n");
+                    if (err) throw err;
+                    const newTotalStock = quantityInStockArray[0] + quantityParsedValue;
+                    console.log(divider + `\nProduct #${idChoiceArray[0]} updated successfully!\n`);
                     managerOptions("What would you like to do now?");
                 });
-        }
+        });
+
+}
 
 function addNewProduct() {
-                inquirer.prompt([
-                    {
-                        type: "input",
-                        name: "name",
-                        message: "What is the name of the product?"
-                    },
-                    {
-                        type: "input",
-                        name: "department_name",
-                        message: "What is the department name of the product?"
-                    },
-                    {
-                        type: "input",
-                        name: "price",
-                        message: "How much does this item cost per unit?"
-                    },
-                    {
-                        type: "input",
-                        name: "quantity",
-                        message: "How much of this item would you like to add?"
-                    }]).then(answers => {
-                        const value1 = answers.name;
-                        const value2 = answers.department_name;
-                        const value3 = answers.price;
-                        const value4 = answers.quantity;
-                        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) VALUES ("${value1}", "${value2}", "${value3}", "${value4}")`, function (err, res) {
-                            if (err) throw err;
-                            console.log(`\n${value1} was added successfully!\n`);
-                            managerOptions("What would you like to do now?");
-                        });
-                    });
-            }
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the product?"
+        },
+        {
+            type: "input",
+            name: "department_name",
+            message: "What is the department name of the product?"
+        },
+        {
+            type: "input",
+            name: "price",
+            message: "How much does this item cost per unit?"
+        },
+        {
+            type: "input",
+            name: "quantity",
+            message: "How much of this item would you like to add?"
+        }
+    ]).then(answers => {
+        const value1 = answers.name;
+        const value2 = answers.department_name;
+        const value3 = answers.price;
+        const value4 = answers.quantity;
+        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) VALUES ("${value1}", "${value2}", "${value3}", "${value4}")`, function (err, res) {
+            if (err) throw err;
+            console.log(`\n${value1} was added successfully!\n`);
+            managerOptions("What would you like to do now?");
+        });
+    });
+};
