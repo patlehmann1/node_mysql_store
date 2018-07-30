@@ -20,12 +20,12 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
     pushIdNumbers();
-    idChoiceArray = [];
-    quantityInStockArray = [];
     managerOptions("Please select from the following:");
 });
 
 function managerOptions(message) {
+    idChoiceArray = [];
+    quantityInStockArray = [];
     inquirer.prompt([
         {
             type: "list",
@@ -124,14 +124,14 @@ function addInventory() {
             name: "quantityQuery",
             message: "How much of this item would you like to add?"
         }]).then(answers => {
-            console.log(quantityInStockArray[0]);
             let quantityParsedValue = parseInt(answers.quantityQuery);
+            const newTotalStock = quantityInStockArray[0] + quantityParsedValue;
             console.log("\nUpdating stock quantity...");
             const query = connection.query(
                 "UPDATE products SET ? WHERE ?",
                 [
                     {
-                        stock_quantity: quantityInStockArray[0] + quantityParsedValue
+                        stock_quantity: newTotalStock
                     },
                     {
                         item_id: idChoiceArray[0]
@@ -139,8 +139,7 @@ function addInventory() {
                 ],
                 function (err, res) {
                     if (err) throw err;
-                    const newTotalStock = quantityInStockArray[0] + quantityParsedValue;
-                    console.log(divider + `\nProduct #${idChoiceArray[0]} updated successfully!\n`);
+                    console.log(divider + `\nProduct #${idChoiceArray[0]} updated successfully!\nYour new quantity total is ${newTotalStock}!\n`);
                     managerOptions("What would you like to do now?");
                 });
         });
