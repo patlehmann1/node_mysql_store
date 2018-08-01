@@ -110,8 +110,8 @@ function updateProduct() {
         ],
         function (err, res) {
             const totalPrice = selectedItemPriceArray[0] * quantityRequestedArray[0];
-            const result = Math.round(totalPrice * 100) / 100;
-            console.log(divider + "\nThe total price of your purchase is $" + result + "!\nHave a fantastic day!");
+            const result = (Math.round(totalPrice * 100) / 100).toFixed(2);
+            console.log(divider + `\nThe total price of your purchase is $${result}.\nHave a fantastic day!`);
             connection.end();
         });
 }
