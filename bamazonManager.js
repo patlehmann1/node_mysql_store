@@ -150,12 +150,12 @@ function addNewProduct() {
     inquirer.prompt([
         {
             type: "input",
-            name: "name",
+            name: "productName",
             message: "What is the name of the product?"
         },
         {
             type: "input",
-            name: "department_name",
+            name: "departmentName",
             message: "What is the department name of the product?"
         },
         {
@@ -169,13 +169,13 @@ function addNewProduct() {
             message: "How much of this item would you like to add?"
         }
     ]).then(answers => {
-        const value1 = answers.name;
-        const value2 = answers.department_name;
-        const value3 = answers.price;
-        const value4 = answers.quantity;
-        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) VALUES ("${value1}", "${value2}", "${value3}", "${value4}")`, function (err, res) {
+        const productName = answers.productName;
+        const departmentName = answers.departmentName;
+        const price = answers.price;
+        const quantity = answers.quantity;
+        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) VALUES ("${productName}", "${departmentName}", "${price}", "${quantity}")`, function (err, res) {
             if (err) throw err;
-            console.log(`\n${value1} was added successfully!\n`);
+            console.log(`\n${productName} was added successfully!\n`);
             managerOptions("What would you like to do now?");
         });
     });
