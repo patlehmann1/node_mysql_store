@@ -139,7 +139,8 @@ function addInventory() {
                 ],
                 function (err, res) {
                     if (err) throw err;
-                    console.log(divider + `\nProduct #${idChoiceArray[0]} updated successfully!\nYour new quantity total is ${newTotalStock}!\n`);
+                    console.log(divider + `\nProduct #${idChoiceArray[0]} updated successfully!
+                    \nYour new quantity total is ${newTotalStock}!\n`);
                     managerOptions("What would you like to do now?");
                 });
         });
