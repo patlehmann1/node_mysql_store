@@ -173,7 +173,8 @@ function addNewProduct() {
         const departmentName = answers.departmentName;
         const price = answers.price;
         const quantity = answers.quantity;
-        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) VALUES ("${productName}", "${departmentName}", "${price}", "${quantity}")`, function (err, res) {
+        connection.query(`INSERT INTO products (product_name, department_name, item_price, stock_quantity) 
+        VALUES ("${productName}", "${departmentName}", "${price}", "${quantity}")`, function (err, res) {
             if (err) throw err;
             console.log(`\n${productName} was added successfully!\n`);
             managerOptions("What would you like to do now?");
